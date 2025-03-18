@@ -4,11 +4,10 @@ import numpy as np
 import cv2
 from PIL import Image
 
-# Load the TFLite model
+
 interpreter = tf.lite.Interpreter(model_path="Brain_T_Model.tflite")
 interpreter.allocate_tensors()
 
-# Get input and output details
 input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
@@ -22,7 +21,7 @@ def preprocess_image(image):
     image = np.expand_dims(image, axis=0).astype(np.float32)  
     return image
 
-# Streamlit UI
+
 st.title("Brain Tumor Classification")
 
 uploaded_file = st.file_uploader("Upload an Image", type=["jpg", "png", "jpeg"])
@@ -31,16 +30,15 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Preprocess image
+    
     processed_image = preprocess_image(image)
 
-    # Run inference using TFLite
+    
     interpreter.set_tensor(input_details[0]['index'], processed_image)
     interpreter.invoke()
     predictions = interpreter.get_tensor(output_details[0]['index'])
 
-    # Get predicted class
     predicted_class = np.argmax(predictions, axis=1)[0]
 
-    # Display result
+   
     st.write(f"**Predicted Class:** {class_labels[predicted_class]}")
